@@ -10,7 +10,7 @@ typedef pcl::PointXYZI PointTypeIO;
 typedef pcl::PointXYZINormal PointTypeFull;
 
 bool
-enforceIntensitySimilarity (const PointTypeFull& point_a, const PointTypeFull& point_b, float squared_distance)
+enforceIntensitySimilarity (const PointTypeFull& point_a, const PointTypeFull& point_b, float squared_distance)              //条件３
 {
   if (fabs (point_a.intensity - point_b.intensity) < 5.0f)
     return (true);
@@ -19,7 +19,7 @@ enforceIntensitySimilarity (const PointTypeFull& point_a, const PointTypeFull& p
 }
 
 bool
-enforceCurvatureOrIntensitySimilarity (const PointTypeFull& point_a, const PointTypeFull& point_b, float squared_distance)
+enforceCurvatureOrIntensitySimilarity (const PointTypeFull& point_a, const PointTypeFull& point_b, float squared_distance)    //条件２
 {
   Eigen::Map<const Eigen::Vector3f> point_a_normal = point_a.normal, point_b_normal = point_b.normal;
   if (fabs (point_a.intensity - point_b.intensity) < 5.0f)
@@ -86,7 +86,7 @@ main (int argc, char** argv)
   std::cerr << "Segmenting to clusters...\n", tt.tic ();
   pcl::ConditionalEuclideanClustering<PointTypeFull> cec (true);
   cec.setInputCloud (cloud_with_normals);
-  cec.setConditionFunction (&customRegionGrowing);
+  cec.setConditionFunction (&customRegionGrowing);    //欧式聚类条件
   cec.setClusterTolerance (500.0);
   cec.setMinClusterSize (cloud_with_normals->points.size () / 1000);
   cec.setMaxClusterSize (cloud_with_normals->points.size () / 5);

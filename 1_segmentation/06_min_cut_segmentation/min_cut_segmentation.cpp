@@ -22,7 +22,7 @@ int main (int argc, char** argv)
   pass.setFilterLimits (0.0, 1.0);
   pass.filter (*indices);
 
-  pcl::MinCutSegmentation<pcl::PointXYZ> seg;
+  pcl::MinCutSegmentation<pcl::PointXYZ> seg;   //创建对象
   seg.setInputCloud (cloud);
   seg.setIndices (indices);
 

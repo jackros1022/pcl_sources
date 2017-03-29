@@ -17,7 +17,7 @@ main (int argc, char** argv)
   pcl::PCDReader reader;
   pcl::PassThrough<PointT> pass;
   pcl::NormalEstimation<PointT, pcl::Normal> ne;
-  pcl::SACSegmentationFromNormals<PointT, pcl::Normal> seg; 
+  pcl::SACSegmentationFromNormals<PointT, pcl::Normal> seg; 　//SACseg法线分割
   pcl::PCDWriter writer;
   pcl::ExtractIndices<PointT> extract;
   pcl::ExtractIndices<pcl::Normal> extract_normals;
@@ -56,10 +56,10 @@ main (int argc, char** argv)
   seg.setMethodType (pcl::SAC_RANSAC);
   seg.setMaxIterations (100);
   seg.setDistanceThreshold (0.03);
-  seg.setInputCloud (cloud_filtered);
-  seg.setInputNormals (cloud_normals);
+  seg.setInputCloud (cloud_filtered);     // 点云  
+  seg.setInputNormals (cloud_normals);    //　法线
   // Obtain the plane inliers and coefficients
-  seg.segment (*inliers_plane, *coefficients_plane);
+  seg.segment (*inliers_plane, *coefficients_plane);    //求取内点和模型参数
   std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
 
   // Extract the planar inliers from the input cloud
@@ -69,19 +69,20 @@ main (int argc, char** argv)
 
   // Write the planar inliers to disk
   pcl::PointCloud<PointT>::Ptr cloud_plane (new pcl::PointCloud<PointT> ());
-  extract.filter (*cloud_plane);
+  extract.filter (*cloud_plane);　 //求取平面
   std::cerr << "PointCloud representing the planar component: " << cloud_plane->points.size () << " data points." << std::endl;
-  writer.write ("table_scene_mug_stereo_textured_plane.pcd", *cloud_plane, false);
+  writer.write ("table_scene_mug_stereo_textured_plane.pcd", *cloud_plane, false);    //保存平面
 
   // Remove the planar inliers, extract the rest
   extract.setNegative (true);
-  extract.filter (*cloud_filtered2);
+  extract.filter (*cloud_filtered2);  //求取平面以外的物体 
   extract_normals.setNegative (true);
   extract_normals.setInputCloud (cloud_normals);
   extract_normals.setIndices (inliers_plane);
-  extract_normals.filter (*cloud_normals2);
+  extract_normals.filter (*cloud_normals2);   //求取平面以外的物体的法线
 
   // Create the segmentation object for cylinder segmentation and set all the parameters
+  //圆柱体分割(使用法线)
   seg.setOptimizeCoefficients (true);
   seg.setModelType (pcl::SACMODEL_CYLINDER);
   seg.setMethodType (pcl::SAC_RANSAC);
@@ -89,19 +90,19 @@ main (int argc, char** argv)
   seg.setMaxIterations (10000);
   seg.setDistanceThreshold (0.05);
   seg.setRadiusLimits (0, 0.1);
-  seg.setInputCloud (cloud_filtered2);
-  seg.setInputNormals (cloud_normals2);
+  seg.setInputCloud (cloud_filtered2);    //已经分割好的　平面以外的物体 
+  seg.setInputNormals (cloud_normals2);   //平面以外的物体的法线
 
   // Obtain the cylinder inliers and coefficients
-  seg.segment (*inliers_cylinder, *coefficients_cylinder);
+  seg.segment (*inliers_cylinder, *coefficients_cylinder);  //求取圆柱和模型系数
   std::cerr << "Cylinder coefficients: " << *coefficients_cylinder << std::endl;
 
   // Write the cylinder inliers to disk
   extract.setInputCloud (cloud_filtered2);
-  extract.setIndices (inliers_cylinder);
+  extract.setIndices (inliers_cylinder);    //inliers_cylinder已经分割好的圆柱点集
   extract.setNegative (false);
   pcl::PointCloud<PointT>::Ptr cloud_cylinder (new pcl::PointCloud<PointT> ());
-  extract.filter (*cloud_cylinder);
+  extract.filter (*cloud_cylinder);   //提取点集
   if (cloud_cylinder->points.empty ()) 
     std::cerr << "Can't find the cylindrical component." << std::endl;
   else

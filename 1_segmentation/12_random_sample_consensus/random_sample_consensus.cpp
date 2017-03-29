@@ -1,3 +1,4 @@
+//不知道模型系数
 #include <iostream>
 #include <pcl/console/parse.h>
 #include <pcl/filters/extract_indices.h>
@@ -8,6 +9,7 @@
 #include <pcl/sample_consensus/sac_model_sphere.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <boost/thread/thread.hpp>
+
 
 boost::shared_ptr<pcl::visualization::PCLVisualizer>
 simpleVis (pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)

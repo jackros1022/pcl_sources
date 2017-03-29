@@ -11,6 +11,7 @@
 int
 main (int argc, char** argv)
 {
+  //建立树
   pcl::search::Search <pcl::PointXYZRGB>::Ptr tree = boost::shared_ptr<pcl::search::Search<pcl::PointXYZRGB> > (new pcl::search::KdTree<pcl::PointXYZRGB>);
 
   pcl::PointCloud <pcl::PointXYZRGB>::Ptr cloud (new pcl::PointCloud <pcl::PointXYZRGB>);
@@ -29,7 +30,7 @@ main (int argc, char** argv)
 
   pcl::RegionGrowingRGB<pcl::PointXYZRGB> reg;
   reg.setInputCloud (cloud);
-  reg.setIndices (indices);
+  reg.setIndices (indices);     //这两行很好的方法
   reg.setSearchMethod (tree);
   reg.setDistanceThreshold (10);
   reg.setPointColorThreshold (6);

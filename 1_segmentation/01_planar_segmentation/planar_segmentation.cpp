@@ -40,28 +40,30 @@ int
   // Create the segmentation object
   pcl::SACSegmentation<pcl::PointXYZ> seg;
   // Optional
-  seg.setOptimizeCoefficients (true);
+  seg.setOptimizeCoefficients (true); //参数优化
   // Mandatory
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setDistanceThreshold (0.01);
+  seg.setDistanceThreshold (0.01);    //阈值
 
   seg.setInputCloud (cloud);
-  seg.segment (*inliers, *coefficients);
+  seg.segment (*inliers, *coefficients);    //求取inliers，并求取模型系数
 
-  if (inliers->indices.size () == 0)
+  if (inliers->indices.size () == 0)    //检查inliers是否为空，否则就是无法估计模型系数
   {
     PCL_ERROR ("Could not estimate a planar model for the given dataset.");
     return (-1);
   }
 
+  //打印模型系数
   std::cerr << "Model coefficients: " << coefficients->values[0] << " " 
                                       << coefficients->values[1] << " "
                                       << coefficients->values[2] << " " 
                                       << coefficients->values[3] << std::endl;
 
-  std::cerr << "Model inliers: " << inliers->indices.size () << std::endl;
-  for (size_t i = 0; i < inliers->indices.size (); ++i)
+  std::cerr << "Model inliers: " << inliers->indices.size () << std::endl;    //输出内点的大小
+  //逐个打印内点的坐标
+  for (size_t i = 0; i < inliers->indices.size (); ++i)       
     std::cerr << inliers->indices[i] << "    " << cloud->points[inliers->indices[i]].x << " "
                                                << cloud->points[inliers->indices[i]].y << " "
                                                << cloud->points[inliers->indices[i]].z << std::endl;
