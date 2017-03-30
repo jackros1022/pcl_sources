@@ -70,7 +70,7 @@ main (int argc, char** argv)
   std::cerr << "Downsampling...\n", tt.tic ();
   pcl::VoxelGrid<PointTypeIO> vg;
   vg.setInputCloud (cloud_in);
-  vg.setLeafSize (80.0, 80.0, 80.0);　//downsample那么大？
+  vg.setLeafSize (0.8,0.8,0.8);
   // all fields need to be downsampled, or false if just XYZ.
   // 所有的领域或者仅仅是XYZ的领域？？？
   vg.setDownsampleAllData (true);   
