@@ -19,6 +19,7 @@ main (int argc, char** argv)
     return (-1);
   }
   //为什么如此定义？要全局使用吗？
+  // 定义searchTree结构
   pcl::search::Search<pcl::PointXYZ>::Ptr tree = boost::shared_ptr<pcl::search::Search<pcl::PointXYZ> > (new pcl::search::KdTree<pcl::PointXYZ>);
 
   pcl::PointCloud <pcl::Normal>::Ptr normals (new pcl::PointCloud <pcl::Normal>);

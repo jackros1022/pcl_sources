@@ -73,8 +73,9 @@ main (int argc, char** argv)
 
   // Creating the KdTree object for the search method of the extraction
   // 为最大平面以外的点集　创建kdtree结构
+  // 定义searchTree结构
   pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
-  tree->setInputCloud (cloud_filtered);
+  tree->setInputCloud (cloud_filtered);　// 树里放了点云
 
   std::vector<pcl::PointIndices> cluster_indices;
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;　//欧式距离提取

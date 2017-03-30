@@ -6,7 +6,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/segmentation/conditional_euclidean_clustering.h>
 
-typedef pcl::PointXYZI PointTypeIO;
+typedef pcl::PointXYZI PointTypeIO;   //宏定义
 typedef pcl::PointXYZINormal PointTypeFull;
 
 bool
@@ -54,9 +54,12 @@ main (int argc, char** argv)
   // Data containers used
   pcl::PointCloud<PointTypeIO>::Ptr cloud_in (new pcl::PointCloud<PointTypeIO>), cloud_out (new pcl::PointCloud<PointTypeIO>);
   pcl::PointCloud<PointTypeFull>::Ptr cloud_with_normals (new pcl::PointCloud<PointTypeFull>);
+  // 聚类索引
   pcl::IndicesClustersPtr clusters (new pcl::IndicesClusters), small_clusters (new pcl::IndicesClusters), large_clusters (new pcl::IndicesClusters);
+  // serchtree结构
   pcl::search::KdTree<PointTypeIO>::Ptr search_tree (new pcl::search::KdTree<PointTypeIO>);
-  pcl::console::TicToc tt;
+  // pcl控制显示台　？
+  pcl::console::TicToc tt;  //显示时间
 
   // Load the input point cloud
   std::cerr << "Loading...\n", tt.tic ();
@@ -67,17 +70,19 @@ main (int argc, char** argv)
   std::cerr << "Downsampling...\n", tt.tic ();
   pcl::VoxelGrid<PointTypeIO> vg;
   vg.setInputCloud (cloud_in);
-  vg.setLeafSize (80.0, 80.0, 80.0);
-  vg.setDownsampleAllData (true);
+  vg.setLeafSize (80.0, 80.0, 80.0);　//downsample那么大？
+  // all fields need to be downsampled, or false if just XYZ.
+  // 所有的领域或者仅仅是XYZ的领域？？？
+  vg.setDownsampleAllData (true);   
   vg.filter (*cloud_out);
   std::cerr << ">> Done: " << tt.toc () << " ms, " << cloud_out->points.size () << " points\n";
 
-  // Set up a Normal Estimation class and merge data in cloud_with_normals
+  // Set up a Normal Estimation class and merge（融合） data in cloud_with_normals
   std::cerr << "Computing normals...\n", tt.tic ();
-  pcl::copyPointCloud (*cloud_out, *cloud_with_normals);
+  pcl::copyPointCloud (*cloud_out, *cloud_with_normals);  //怎么拷贝的？？？
   pcl::NormalEstimation<PointTypeIO, PointTypeFull> ne;
   ne.setInputCloud (cloud_out);
-  ne.setSearchMethod (search_tree);
+  ne.setSearchMethod (search_tree);   //树里面也没放东西啊
   ne.setRadiusSearch (300.0);
   ne.compute (*cloud_with_normals);
   std::cerr << ">> Done: " << tt.toc () << " ms\n";
@@ -91,10 +96,10 @@ main (int argc, char** argv)
   cec.setMinClusterSize (cloud_with_normals->points.size () / 1000);
   cec.setMaxClusterSize (cloud_with_normals->points.size () / 5);
   cec.segment (*clusters);
-  cec.getRemovedClusters (small_clusters, large_clusters);
+  cec.getRemovedClusters (small_clusters, large_clusters); //Get the clusters that are invalidated due to size constraints.
   std::cerr << ">> Done: " << tt.toc () << " ms\n";
 
-  // Using the intensity channel for lazy visualization of the output
+  // Using the intensity(强度) channel for lazy visualization of the output
   for (int i = 0; i < small_clusters->size (); ++i)
     for (int j = 0; j < (*small_clusters)[i].indices.size (); ++j)
       cloud_out->points[(*small_clusters)[i].indices[j]].intensity = -2.0;
