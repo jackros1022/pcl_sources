@@ -1,3 +1,4 @@
+//RANSAC算法使用SACSegmentationFromNormals分割圆柱物体
 #include <pcl/ModelCoefficients.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -37,6 +38,7 @@ main (int argc, char** argv)
   std::cerr << "PointCloud has: " << cloud->points.size () << " data points." << std::endl;
 
   // Build a passthrough filter to remove spurious NaNs
+  // z轴直通滤波
   pass.setInputCloud (cloud);
   pass.setFilterFieldName ("z");
   pass.setFilterLimits (0, 1.5);
@@ -59,7 +61,7 @@ main (int argc, char** argv)
   seg.setInputCloud (cloud_filtered);     // 点云  
   seg.setInputNormals (cloud_normals);    //　法线
   // Obtain the plane inliers and coefficients
-  seg.segment (*inliers_plane, *coefficients_plane);    //求取内点和模型参数
+  seg.segment (*inliers_plane, *coefficients_plane);    //求取内点和模型参数。　RANSAC估计的inliers和模型，需要进一步提取
   std::cerr << "Plane coefficients: " << *coefficients_plane << std::endl;
 
   // Extract the planar inliers from the input cloud
@@ -82,7 +84,7 @@ main (int argc, char** argv)
   extract_normals.filter (*cloud_normals2);   //求取平面以外的物体的法线
 
   // Create the segmentation object for cylinder segmentation and set all the parameters
-  //圆柱体分割(使用法线)
+  //　圆柱体分割(使用法线)
   seg.setOptimizeCoefficients (true);
   seg.setModelType (pcl::SACMODEL_CYLINDER);
   seg.setMethodType (pcl::SAC_RANSAC);

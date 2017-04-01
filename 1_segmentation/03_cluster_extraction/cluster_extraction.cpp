@@ -30,6 +30,7 @@ main (int argc, char** argv)
   std::cout << "PointCloud after filtering has: " << cloud_filtered->points.size ()  << " data points." << std::endl; //*
 
   // Create the segmentation object for the planar model and set all the parameters
+  // 采样一致性分割　特点：只能分割出一个目标
   pcl::SACSegmentation<pcl::PointXYZ> seg;　//创建SACSeg分割
   pcl::PointIndices::Ptr inliers (new pcl::PointIndices);　
   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
@@ -42,13 +43,13 @@ main (int argc, char** argv)
   seg.setDistanceThreshold (0.02);
 
   int i=0, nr_points = (int) cloud_filtered->points.size ();
-  while (cloud_filtered->points.size () > 0.3 * nr_points)  //和自身比较　0.3倍什么意思
+  while (cloud_filtered->points.size () > 0.3 * nr_points)  //和自身比较　0.3倍什么意思。怎么求得
   {
     // Segment the largest planar component from the remaining cloud
-    // 分割出最大的平面部分，求内点集和系数
+    // 分割出最大的平面部分
     seg.setInputCloud (cloud_filtered);
-    seg.segment (*inliers, *coefficients);
-    if (inliers->indices.size () == 0)　// 安全保险,求取内点，并求取模型系数
+    seg.segment (*inliers, *coefficients); //求内点集和系数（模型估计）
+    if (inliers->indices.size () == 0)　// 安全保险
     {
       std::cout << "Could not estimate a planar model for the given dataset." << std::endl;
       break;
@@ -77,7 +78,7 @@ main (int argc, char** argv)
   pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
   tree->setInputCloud (cloud_filtered);　// 树里放了点云
 
-  std::vector<pcl::PointIndices> cluster_indices;
+  std::vector<pcl::PointIndices> cluster_indices;　　//这个定义很有趣
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;　//欧式距离提取
   ec.setClusterTolerance (0.02); // 2cm
   ec.setMinClusterSize (100);

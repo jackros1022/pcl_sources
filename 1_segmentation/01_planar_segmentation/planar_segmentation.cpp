@@ -1,3 +1,4 @@
+//RANSAC算法使用SACSegmentation分割平面
 #include <iostream>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/io/pcd_io.h>
@@ -35,8 +36,8 @@ int
                         << cloud->points[i].y << " "
                         << cloud->points[i].z << std::endl;
 
-  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);  //定义模型参数
+  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);     //定义内点集索引
   // Create the segmentation object
   pcl::SACSegmentation<pcl::PointXYZ> seg;
   // Optional
