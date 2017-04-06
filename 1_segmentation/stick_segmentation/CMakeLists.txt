@@ -4,6 +4,9 @@ project(stick_segmentation)
 
 find_package(PCL 1.2 REQUIRED)
 
+SET(CMAKE_CXX_COMPILER mpicxx)
+include_directories(MPI_INCLUDE_PATH)
+
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})

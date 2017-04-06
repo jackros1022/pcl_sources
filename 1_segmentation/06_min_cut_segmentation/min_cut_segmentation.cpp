@@ -1,3 +1,6 @@
+/*
+- 为甚么moudel模块怎么没有类文件
+*/
 #include <iostream>
 #include <vector>
 #include <pcl/io/pcd_io.h>
@@ -15,6 +18,7 @@ int main (int argc, char** argv)
     return (-1);
   }
 
+  // 索引
   pcl::IndicesPtr indices (new std::vector <int>);
   pcl::PassThrough<pcl::PointXYZ> pass;
   pass.setInputCloud (cloud);

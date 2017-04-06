@@ -43,7 +43,7 @@ main (int argc, char** argv)
   seg.setDistanceThreshold (0.02);
 
   int i=0, nr_points = (int) cloud_filtered->points.size ();
-  while (cloud_filtered->points.size () > 0.3 * nr_points)  //和自身比较　0.3倍什么意思。怎么求得
+  while (cloud_filtered->points.size () > 0.3 * nr_points)  //★　和自身比较　0.3倍，这样合理吗？
   {
     // Segment the largest planar component from the remaining cloud
     // 分割出最大的平面部分
@@ -76,7 +76,8 @@ main (int argc, char** argv)
   // 为最大平面以外的点集　创建kdtree结构
   // 定义searchTree结构
   pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
-  tree->setInputCloud (cloud_filtered);　// 树里放了点云
+  tree->setInputCloud (cloud_filtered);　// ★　树里放了点云
+                                        // 1.使用欧式聚类提取要遍历点云，建立搜索结构。 
 
   std::vector<pcl::PointIndices> cluster_indices;　　//这个定义很有趣
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;　//欧式距离提取

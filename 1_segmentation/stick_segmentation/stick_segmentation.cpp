@@ -32,6 +32,7 @@ class ConditionThresholdHSV : public pcl::ConditionBase<PointT>
     }
     
     // Evaluate whether the color of the given point falls within the specified thresholds
+    // 怎么和输入的点云有关系？？？
     virtual bool evaluate(const PointT & p) const
     {
       float h, s, v;
@@ -42,6 +43,7 @@ class ConditionThresholdHSV : public pcl::ConditionBase<PointT>
               (min_v_ <= v) && (v <= max_v_));
     }
     
+    // rgb 转化　hsv
     void rgb2hsv (uint8_t r, uint8_t g, uint8_t b, float & h, float & s, float & v) const
     {
       float maxval = (r > g) ? ((r > b) ? r : b) : ((g > b) ? g : b);
@@ -82,6 +84,7 @@ filterRed (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, pcl::PointCloud<
 {
   pcl::ConditionalRemoval<pcl::PointXYZRGB> removal_filter;
   removal_filter.setKeepOrganized (false);
+  // 自定义　类模板
   ConditionThresholdHSV<pcl::PointXYZRGB>::Ptr condition (new ConditionThresholdHSV<pcl::PointXYZRGB> (-20,20, 75,100, 25,255));
   removal_filter.setCondition (condition);
 
@@ -95,6 +98,7 @@ filterGreen (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, pcl::PointClou
 {
   pcl::ConditionalRemoval<pcl::PointXYZRGB> removal_filter;
   removal_filter.setKeepOrganized (false);
+  // 自定义　类模板
   ConditionThresholdHSV<pcl::PointXYZRGB>::Ptr condition (new ConditionThresholdHSV<pcl::PointXYZRGB> (90,150, 15,100, 25,255));
   removal_filter.setCondition (condition);
 
@@ -104,8 +108,7 @@ filterGreen (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, pcl::PointClou
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-downsample (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, 
-            pcl::PointCloud<pcl::PointXYZRGB>::Ptr &output)
+downsample (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, pcl::PointCloud<pcl::PointXYZRGB>::Ptr &output)
 {
   pcl::VoxelGrid<pcl::PointXYZRGB> pass;
   pass.setInputCloud (input);
@@ -116,10 +119,9 @@ downsample (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input,
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//　怎么得到最大的聚类？？？
 void
-extractLargestCluster (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, 
-                       const pcl::PointIndices::Ptr &inliers_all,
-                       pcl::PointIndices &inliers)
+extractLargestCluster (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input,const pcl::PointIndices::Ptr &inliers_all,pcl::PointIndices &inliers)
 {
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ece;
   ece.setInputCloud (input);
@@ -132,13 +134,11 @@ extractLargestCluster (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-compute (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input, 
-         pcl::PointCloud<pcl::PointXYZRGB>::Ptr &output,
-         pcl::ModelCoefficients &coefficients,
-         pcl::PointIndices &inliers)
+compute (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input,pcl::PointCloud<pcl::PointXYZRGB>::Ptr &output,pcl::ModelCoefficients &coefficients,pcl::PointIndices &inliers)
 {
   // Filter
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr output_down (new pcl::PointCloud<pcl::PointXYZRGB>);
+  // 函数调用downsample
   downsample (input, output_down);
 
   if (output_down->points.empty ())
@@ -147,6 +147,7 @@ compute (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input,
     coefficients.values.clear ();
     return;
   }
+  //　函数调用filterGreen
   filterGreen (output_down, output);
 
   if (output->points.empty ())
@@ -173,6 +174,7 @@ compute (const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &input,
     return;
   }
 
+  //　函数调用　extractLargestCluster
   extractLargestCluster (output, inliers_all, inliers);
 }
 
@@ -199,8 +201,10 @@ main (int argc, char** argv)
     // Compute
     pcl::console::TicToc tt;
     tt.tic ();
+    
+    // 调用函数 计算inliers　和　coefficients
     compute (cloud, cloud_f, coefficients, inliers);
-    tt.toc_print ();
+    tt.toc_print ();    // 打印出计算时间
 
     if (inliers.indices.empty ())
     {

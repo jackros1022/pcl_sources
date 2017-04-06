@@ -38,6 +38,7 @@ int
 
   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);  //定义模型参数
   pcl::PointIndices::Ptr inliers (new pcl::PointIndices);     //定义内点集索引
+  
   // Create the segmentation object
   pcl::SACSegmentation<pcl::PointXYZ> seg;
   // Optional

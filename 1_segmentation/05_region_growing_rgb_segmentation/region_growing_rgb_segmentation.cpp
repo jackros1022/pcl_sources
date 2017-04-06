@@ -21,6 +21,7 @@ main (int argc, char** argv)
     return (-1);
   }
 
+  // 索引
   pcl::IndicesPtr indices (new std::vector <int>);
   pcl::PassThrough<pcl::PointXYZRGB> pass;
   pass.setInputCloud (cloud);
@@ -28,6 +29,7 @@ main (int argc, char** argv)
   pass.setFilterLimits (0.0, 1.0);
   pass.filter (*indices);
 
+  // RegionGrowingRGB分割
   pcl::RegionGrowingRGB<pcl::PointXYZRGB> reg;
   reg.setInputCloud (cloud);
   reg.setIndices (indices);     //这两行很好的方法
@@ -37,6 +39,7 @@ main (int argc, char** argv)
   reg.setRegionColorThreshold (5);
   reg.setMinClusterSize (600);
 
+  // 分割一组数据　vector
   std::vector <pcl::PointIndices> clusters;
   reg.extract (clusters);
 

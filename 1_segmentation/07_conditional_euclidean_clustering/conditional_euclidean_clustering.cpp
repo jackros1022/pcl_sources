@@ -88,10 +88,11 @@ main (int argc, char** argv)
   std::cerr << ">> Done: " << tt.toc () << " ms\n";
 
   // Set up a Conditional Euclidean Clustering class
+  //欧式聚类条件
   std::cerr << "Segmenting to clusters...\n", tt.tic ();
   pcl::ConditionalEuclideanClustering<PointTypeFull> cec (true);
   cec.setInputCloud (cloud_with_normals);
-  cec.setConditionFunction (&customRegionGrowing);    //欧式聚类条件
+  cec.setConditionFunction (&customRegionGrowing);    
   cec.setClusterTolerance (500.0);
   cec.setMinClusterSize (cloud_with_normals->points.size () / 1000);
   cec.setMaxClusterSize (cloud_with_normals->points.size () / 5);

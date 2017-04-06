@@ -13,7 +13,7 @@ int
 main (int argc, char** argv)
 {
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  if ( pcl::io::loadPCDFile <pcl::PointXYZ> ("region_growing_tutorial.pcd", *cloud) == -1)
+  if ( pcl::io::loadPCDFile <pcl::PointXYZ> ("/home/jack/ros/pcl/pcl_sources/1_segmentation/04_region_growing_segmentation/region_growing_tutorial.pcd", *cloud) == -1)
   {
     std::cout << "Cloud reading failed." << std::endl;
     return (-1);
@@ -22,6 +22,7 @@ main (int argc, char** argv)
   // 定义searchTree结构
   pcl::search::Search<pcl::PointXYZ>::Ptr tree = boost::shared_ptr<pcl::search::Search<pcl::PointXYZ> > (new pcl::search::KdTree<pcl::PointXYZ>);
 
+  //　法线
   pcl::PointCloud <pcl::Normal>::Ptr normals (new pcl::PointCloud <pcl::Normal>);
   pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normal_estimator;
   normal_estimator.setSearchMethod (tree);  //树里没有放东西啊？
@@ -29,6 +30,7 @@ main (int argc, char** argv)
   normal_estimator.setKSearch (50);   //the number of k nearest neighbors to use for the feature estimation.
   normal_estimator.compute (*normals);
 
+  // 索引
   pcl::IndicesPtr indices (new std::vector <int>);
   pcl::PassThrough<pcl::PointXYZ> pass;
   pass.setInputCloud (cloud);
@@ -36,7 +38,8 @@ main (int argc, char** argv)
   pass.setFilterLimits (0.0, 1.0);
   pass.filter (*indices);     //ｚ轴直通滤波
 
-  pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> reg;   //区域生长分割
+  //　区域生长分割
+  pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> reg;   
   reg.setMinClusterSize (50);
   reg.setMaxClusterSize (1000000);
   reg.setSearchMethod (tree);   //树里没有放东西啊？
@@ -47,8 +50,10 @@ main (int argc, char** argv)
   reg.setSmoothnessThreshold (3.0 / 180.0 * M_PI);    //区域分割　平滑参数
   reg.setCurvatureThreshold (1.0);  //曲率阈值
 
+  //　区域生长分割求出的是一组聚类
+  // 分割一组数据　vector
   std::vector <pcl::PointIndices> clusters;   //向量容器
-  reg.extract (clusters);   //区域生长分割求出的是一组聚类
+  reg.extract (clusters);   
 
   std::cout << "Number of clusters is equal to " << clusters.size () << std::endl;
   std::cout << "First cluster has " << clusters[0].indices.size () << " points." << endl;   //indices是什么参数？
@@ -65,7 +70,8 @@ main (int argc, char** argv)
   }
   std::cout << std::endl;
 
-  pcl::PointCloud <pcl::PointXYZRGB>::Ptr colored_cloud = reg.getColoredCloud ();   //很棒
+  // 给分割的一组点云加颜色显示
+  pcl::PointCloud <pcl::PointXYZRGB>::Ptr colored_cloud = reg.getColoredCloud ();   
   pcl::visualization::CloudViewer viewer ("Cluster viewer");
   viewer.showCloud(colored_cloud);
   while (!viewer.wasStopped ())
