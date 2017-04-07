@@ -1,5 +1,6 @@
 #include "pclviewer.h"
-#include "../build/ui_pclviewer.h"
+//#include "../build/ui_pclviewer.h"
+#include "../build-qt_colorize_cloud-Desktop-Default/ui_pclviewer.h"
 
 PCLViewer::PCLViewer (QWidget *parent) :
     QMainWindow (parent),
