@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 	// We need to set the size of the descriptor beforehand.
 	viewer.addFeatureHistogram(*descriptor, 308);
  
-	viewer.spin();
+	viewer.spin();	//有显示的地方就有spin();
 	
 	return 0;
 }
