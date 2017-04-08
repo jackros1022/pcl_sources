@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	normalEstimation.setSearchMethod(kdtree);
 	normalEstimation.compute(*normals);
 	
-	// PFH estimation object
+	// PFHE estimation object
 	pcl::FPFHEstimation<pcl::PointXYZ,pcl::Normal,pcl::FPFHSignature33> fpfh;
 	fpfh.setInputCloud(cloud);
 	fpfh.setInputNormals(normals);
@@ -47,8 +47,9 @@ int main(int argc, char** argv)
 	fpfh.setRadiusSearch(0.05);
 	
 	fpfh.compute(*descriptors);
+    std::cout <<"compute compute"<<std::endl;
 	
-	/*
+/*	
 	// Visualize the descriptors ???
 	pcl::visualization::CloudViewer viewerDescriptors(" Visualize Descriptors");
 	viewerDescriptors.showCloud(descriptors);
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
 	{
 		// Do nothing
 	}
-	*/		
-	
+	*/
+
 	return 0;
 }

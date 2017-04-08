@@ -4,6 +4,8 @@ project(cylinder_segmentation)
 
 find_package(PCL 1.2 REQUIRED)
 
+include(CMakeToolsHelpers OPTIONAL)
+
 SET(CMAKE_C_COMPILER mpicc)
 SET(CMAKE_CXX_COMPILER mpicxx)
 include_directories(MPI_INCLUDE_PATH)
