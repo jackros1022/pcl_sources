@@ -11,6 +11,7 @@ int main (int argc, char** argv)
     return (-1);
 
   pcl::PointIndicesPtr indices = boost::shared_ptr <pcl::PointIndices> (new pcl::PointIndices ());
+  // 数据流打开，关闭
   std::ifstream indices_file;
   indices_file.open (argv[2], std::ifstream::in);
   for (std::string line; std::getline (indices_file, line);)

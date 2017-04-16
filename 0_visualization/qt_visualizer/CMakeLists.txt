@@ -30,9 +30,10 @@ ADD_EXECUTABLE  (pcl_visualizer ${project_SOURCES}
 TARGET_LINK_LIBRARIES (pcl_visualizer ${PCL_LIBRARIES})
 
 qt5_use_modules (pcl_visualizer Widgets)
+
 #-------------------------------------------------------------------------------------
 
-#--- ｐｃｌ官网原来配置文件，无法编译通过
+#--- ｐｃｌ官网原来配置文件，无法编译通过2017-04-08
 #cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
 
 #project      (pcl-visualizer)
