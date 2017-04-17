@@ -73,6 +73,7 @@ int main(int argc, char** argv)
 	// Plotter object.
 	pcl::visualization::PCLHistogramVisualizer viewer;
 	// We need to set the size of the descriptor beforehand.
+	viewer.setBackgroundColor(0 ,0 ,0);
 	viewer.addFeatureHistogram(*descriptor, 308);
  
 	viewer.spin();	//有显示的地方就有spin();

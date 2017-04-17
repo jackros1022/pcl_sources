@@ -77,7 +77,7 @@ main (int argc, char** argv)
   // 定义searchTree结构
   pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
   tree->setInputCloud (cloud_filtered);　// ★　树里放了点云
-                                        // 1.使用欧式聚类提取要遍历点云，建立搜索结构。 
+                                         // 1.使用欧式聚类提取要遍历点云，建立搜索结构。 
 
   std::vector<pcl::PointIndices> cluster_indices;　　//这个定义很有趣
   pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;　//欧式距离提取

@@ -68,8 +68,8 @@ loadHist (const boost::filesystem::path &path, vfh_model &vfh)
   * \param distances the resultant neighbor distances
   */
 inline void
-nearestKSearch (flann::Index<flann::ChiSquareDistance<float> > &index, const vfh_model &model, 
-                int k, flann::Matrix<int> &indices, flann::Matrix<float> &distances)
+nearestKSearch (flann::Index<flann::ChiSquareDistance<float> > &index, const vfh_model &model, int k, 
+                flann::Matrix<int> &indices, flann::Matrix<float> &distances)
 {
   // Query point
   flann::Matrix<float> p = flann::Matrix<float>(new float[model.second.size ()], 1, model.second.size ());

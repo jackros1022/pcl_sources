@@ -14,6 +14,7 @@ typedef std::pair<std::string, std::vector<float> > vfh_model;
   * \param path the input file name
   * \param vfh the resultant VFH model
   */
+  // 尝试打开每个找到的PCD文件，读取它的头，并检查它是否包含一个VFH签名。
 bool
 loadHist (const boost::filesystem::path &path, vfh_model &vfh)
 {
@@ -62,9 +63,9 @@ loadHist (const boost::filesystem::path &path, vfh_model &vfh)
   * \param extension the file extension containing the VFH features
   * \param models the resultant vector of histogram models
   */
+  // 执行递归遍历一组目录和子目录，并在文件中加载所有.PCD
 void
-loadFeatureModels (const boost::filesystem::path &base_dir, const std::string &extension, 
-                   std::vector<vfh_model> &models)
+loadFeatureModels (const boost::filesystem::path &base_dir, const std::string &extension, std::vector<vfh_model> &models)
 {
   if (!boost::filesystem::exists (base_dir) && !boost::filesystem::is_directory (base_dir))
     return;
@@ -96,6 +97,7 @@ main (int argc, char** argv)
     return (-1);
   }
 
+  // 字符串容器
   std::string extension (".pcd");
   transform (extension.begin (), extension.end (), extension.begin (), (int(*)(int))tolower);
 
@@ -103,6 +105,7 @@ main (int argc, char** argv)
   std::string training_data_h5_file_name = "training_data.h5";
   std::string training_data_list_file_name = "training_data.list";
 
+  // models容器
   std::vector<vfh_model> models;
 
   // Load the model histograms
@@ -111,6 +114,7 @@ main (int argc, char** argv)
       (int)models.size (), training_data_h5_file_name.c_str (), training_data_list_file_name.c_str ());
 
   // Convert data into FLANN format
+  // data 数组
   flann::Matrix<float> data (new float[models.size () * models[0].second.size ()], models.size (), models[0].second.size ());
 
   for (size_t i = 0; i < data.rows; ++i)
