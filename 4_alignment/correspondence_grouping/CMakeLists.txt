@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-
+SET(CMAKE_C_COMPILER mpicc)
+SET(CMAKE_CXX_COMPILER mpicxx)
+include_directories(MPI_INCLUDE_PATH)
 project(correspondence_grouping)
 
 find_package(PCL 1.5 REQUIRED)

@@ -4,7 +4,8 @@
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/shot_omp.h>
 #include <pcl/features/board.h>
-#include <pcl/filters/uniform_sampling.h>
+// #include <pcl/filters/uniform_sampling.h>
+#include <pcl/keypoints/uniform_sampling.h>
 #include <pcl/recognition/cg/hough_3d.h>
 #include <pcl/recognition/cg/geometric_consistency.h>
 #include <pcl/visualization/pcl_visualizer.h>
@@ -15,17 +16,17 @@
 
 typedef pcl::PointXYZRGBA PointType;
 typedef pcl::Normal NormalType;
-typedef pcl::ReferenceFrame RFType;
-typedef pcl::SHOT352 DescriptorType;
+typedef pcl::ReferenceFrame RFType; //参考的坐标系
+typedef pcl::SHOT352 DescriptorType;  //描述符类型
 
 std::string model_filename_;
 std::string scene_filename_;
 
 //Algorithm params
 bool show_keypoints_ (false);
-bool show_correspondences_ (false);
+bool show_correspondences_ (true);
 bool use_cloud_resolution_ (false);
-bool use_hough_ (true);
+bool use_hough_ (false);
 float model_ss_ (0.01f);
 float scene_ss_ (0.03f);
 float rf_rad_ (0.015f);
@@ -221,7 +222,8 @@ main (int argc, char *argv[])
   //
   //  Downsample Clouds to Extract keypoints
   //
-
+/*
+ * pcl 1.7
   pcl::UniformSampling<PointType> uniform_sampling;
   uniform_sampling.setInputCloud (model);
   uniform_sampling.setRadiusSearch (model_ss_);
@@ -233,7 +235,25 @@ main (int argc, char *argv[])
   uniform_sampling.filter (*scene_keypoints);
   std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl;
 
+*/
+  pcl::UniformSampling<PointType> uniform_sampling;
+  uniform_sampling.setInputCloud (model);
+  uniform_sampling.setRadiusSearch (model_ss_);
+  //uniform_sampling.filter (*model_keypoints);
+  pcl::PointCloud<int> keypointIndices1;
+  uniform_sampling.compute(keypointIndices1);
+  pcl::copyPointCloud(*model, keypointIndices1.points, *model_keypoints);
 
+  std::cout << "Model total points: " << model->size () << "; Selected Keypoints: " << model_keypoints->size () << std::endl;
+
+  uniform_sampling.setInputCloud (scene);
+  uniform_sampling.setRadiusSearch (scene_ss_);
+  //uniform_sampling.filter (*scene_keypoints);
+  pcl::PointCloud<int> keypointIndices2;
+  uniform_sampling.compute(keypointIndices2);
+  pcl::copyPointCloud(*scene, keypointIndices2.points, *scene_keypoints);
+
+  std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl;
   //
   //  Compute Descriptor for keypoints
   //
@@ -253,6 +273,7 @@ main (int argc, char *argv[])
   //
   //  Find Model-Scene Correspondences with KdTree
   //
+  //  初步对应关系  model_scene_corrs
   pcl::CorrespondencesPtr model_scene_corrs (new pcl::Correspondences ());
 
   pcl::KdTreeFLANN<DescriptorType> match_search;
@@ -268,7 +289,8 @@ main (int argc, char *argv[])
       continue;
     }
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
-    if(found_neighs == 1 && neigh_sqr_dists[0] < 0.25f) //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    //  add match only if the squared descriptor distance is less than 0.25 (SHOT descriptor distances are between 0 and 1 by design)
+    if(found_neighs == 1 && neigh_sqr_dists[0] < 0.25f)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
@@ -279,6 +301,7 @@ main (int argc, char *argv[])
   //
   //  Actual Clustering
   //
+  // Hough估计的对应关系和转换矩阵   clustered_corrs 、 rototranslations
   std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > rototranslations;
   std::vector<pcl::Correspondences> clustered_corrs;
 
@@ -287,10 +310,11 @@ main (int argc, char *argv[])
   {
     //
     //  Compute (Keypoints) Reference Frames only for Hough
-    //
+    //  建立参考坐标系
     pcl::PointCloud<RFType>::Ptr model_rf (new pcl::PointCloud<RFType> ());
     pcl::PointCloud<RFType>::Ptr scene_rf (new pcl::PointCloud<RFType> ());
 
+    //  局部参考系
     pcl::BOARDLocalReferenceFrameEstimation<PointType, NormalType, RFType> rf_est;
     rf_est.setFindHoles (true);
     rf_est.setRadiusSearch (rf_rad_);
@@ -327,6 +351,7 @@ main (int argc, char *argv[])
     gc_clusterer.setGCSize (cg_size_);
     gc_clusterer.setGCThreshold (cg_thresh_);
 
+    // 直接输入关键点
     gc_clusterer.setInputCloud (model_keypoints);
     gc_clusterer.setSceneCloud (scene_keypoints);
     gc_clusterer.setModelSceneCorrespondences (model_scene_corrs);

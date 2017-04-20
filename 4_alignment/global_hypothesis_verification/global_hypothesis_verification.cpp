@@ -41,7 +41,8 @@
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/shot_omp.h>
 #include <pcl/features/board.h>
-#include <pcl/filters/uniform_sampling.h>
+// #include <pcl/filters/uniform_sampling.h>
+#include <pcl/keypoints/uniform_sampling.h>
 #include <pcl/recognition/cg/hough_3d.h>
 #include <pcl/recognition/cg/geometric_consistency.h>
 #include <pcl/recognition/hv/hv_go.h>
@@ -145,8 +146,7 @@ showHelp (char *filename)
  * @param argv
  */
 void
-parseCommandLine (int argc,
-                  char *argv[])
+parseCommandLine (int argc,char *argv[])
 {
   //Show help
   if (pcl::console::find_switch (argc, argv, "-h"))
@@ -212,8 +212,7 @@ parseCommandLine (int argc,
 }
 
 int
-main (int argc,
-      char *argv[])
+main (int argc,char *argv[])
 {
   parseCommandLine (argc, argv);
 
@@ -243,10 +242,13 @@ main (int argc,
   }
 
   /**
-   * Compute Normals
+   * Compute Normals 
+   * 直接从原始点云计算法线
    */
+   
   pcl::NormalEstimationOMP<PointType, NormalType> norm_est;
   norm_est.setKSearch (10);
+
   norm_est.setInputCloud (model);
   norm_est.compute (*model_normals);
 
@@ -256,6 +258,8 @@ main (int argc,
   /**
    *  Downsample Clouds to Extract keypoints
    */
+
+  /*
   pcl::UniformSampling<PointType> uniform_sampling;
   uniform_sampling.setInputCloud (model);
   uniform_sampling.setRadiusSearch (model_ss_);
@@ -266,9 +270,29 @@ main (int argc,
   uniform_sampling.setRadiusSearch (scene_ss_);
   uniform_sampling.filter (*scene_keypoints);
   std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl;
+  */
+  pcl::UniformSampling<PointType> uniform_sampling;
+  uniform_sampling.setInputCloud (model);
+  uniform_sampling.setRadiusSearch (model_ss_);
+  //uniform_sampling.filter (*model_keypoints);
+  pcl::PointCloud<int> keypointIndices1;
+  uniform_sampling.compute(keypointIndices1);
+  pcl::copyPointCloud(*model, keypointIndices1.points, *model_keypoints);
+
+  std::cout << "Model total points: " << model->size () << "; Selected Keypoints: " << model_keypoints->size () << std::endl;
+
+  uniform_sampling.setInputCloud (scene);
+  uniform_sampling.setRadiusSearch (scene_ss_);
+  //uniform_sampling.filter (*scene_keypoints);
+  pcl::PointCloud<int> keypointIndices2;
+  uniform_sampling.compute(keypointIndices2);
+  pcl::copyPointCloud(*scene, keypointIndices2.points, *scene_keypoints);
+
+  std::cout << "Scene total points: " << scene->size () << "; Selected Keypoints: " << scene_keypoints->size () << std::endl;
 
   /**
    *  Compute Descriptor for keypoints
+   *  计算描述符，使用uniform关键点
    */
   pcl::SHOTEstimationOMP<PointType, NormalType, DescriptorType> descr_est;
   descr_est.setRadiusSearch (descr_rad_);
@@ -285,9 +309,11 @@ main (int argc,
 
   /**
    *  Find Model-Scene Correspondences with KdTree
+   *  通过KdTree，查找模型和场景的对应关系
+   *  查找初步对应关系
    */
   pcl::CorrespondencesPtr model_scene_corrs (new pcl::Correspondences ());
-  pcl::KdTreeFLANN<DescriptorType> match_search;
+  pcl::KdTreeFLANN<DescriptorType> match_search;    // 匹配查找
   match_search.setInputCloud (model_descriptors);
   std::vector<int> model_good_keypoints_indices;
   std::vector<int> scene_good_keypoints_indices;
@@ -301,6 +327,7 @@ main (int argc,
       continue;
     }
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
+    //  小于阈值视为好的匹配
     if (found_neighs == 1 && neigh_sqr_dists[0] < 0.25f)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
@@ -311,6 +338,7 @@ main (int argc,
   }
   pcl::PointCloud<PointType>::Ptr model_good_kp (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr scene_good_kp (new pcl::PointCloud<PointType> ());
+  //    通过索引，提取点云
   pcl::copyPointCloud (*model_keypoints, model_good_keypoints_indices, *model_good_kp);
   pcl::copyPointCloud (*scene_keypoints, scene_good_keypoints_indices, *scene_good_kp);
 
@@ -324,6 +352,7 @@ main (int argc,
 
   if (use_hough_)
   {
+    // 定义参考系
     pcl::PointCloud<RFType>::Ptr model_rf (new pcl::PointCloud<RFType> ());
     pcl::PointCloud<RFType>::Ptr scene_rf (new pcl::PointCloud<RFType> ());
 
@@ -339,7 +368,7 @@ main (int argc,
     rf_est.setInputCloud (scene_keypoints);
     rf_est.setInputNormals (scene_normals);
     rf_est.setSearchSurface (scene);
-    rf_est.compute (*scene_rf);
+    rf_est.compute (*scene_rf); //  计算场景局部坐标系
 
     //  Clustering
     pcl::Hough3DGrouping<PointType, PointType, RFType, RFType> clusterer;
@@ -371,6 +400,7 @@ main (int argc,
 
   /**
    * Stop if no instances
+   * 判断是否求出转换矩阵
    */
   if (rototranslations.size () <= 0)
   {
@@ -396,7 +426,11 @@ main (int argc,
 
   /**
    * ICP
+   * ICP也跑来凑热闹？
    */
+
+   // ICP优化配准
+   // To improve the coarse transformation associated to each object hypothesis
   std::vector<pcl::PointCloud<PointType>::ConstPtr> registered_instances;
   if (true)
   {
@@ -423,11 +457,12 @@ main (int argc,
       }
     }
 
-    cout << "-----------------" << endl << endl;
+    cout << "-------------------------------" << endl << endl;
   }
 
   /**
    * Hypothesis Verification
+   * 传说的 假设验证？
    */
   cout << "--- Hypotheses Verification ---" << endl;
   std::vector<bool> hypotheses_mask;  // Mask Vector to identify positive hypotheses

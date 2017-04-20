@@ -8,6 +8,9 @@
 # FLANN_DEFINITIONS - Compiler flags for FLANN.
 # If FLANN_USE_STATIC is specified and then look for static libraries ONLY else
 # look for shared ones
+SET(CMAKE_C_COMPILER mpicc)
+SET(CMAKE_CXX_COMPILER mpicxx)
+include_directories(MPI_INCLUDE_PATH)
 
 if(FLANN_USE_STATIC)
   set(FLANN_RELEASE_NAME flann_cpp_s)

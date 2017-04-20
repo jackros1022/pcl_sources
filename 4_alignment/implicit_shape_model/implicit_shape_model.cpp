@@ -14,11 +14,13 @@ main (int argc, char** argv)
   if (argc == 0 || argc % 2 == 0)
     return (-1);
 
+  // 训练数据数量 ？？？
   unsigned int number_of_training_clouds = (argc - 3) / 2;
 
   pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normal_estimator;
   normal_estimator.setRadiusSearch (25.0);
 
+  // 数据容器
   std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> training_clouds;
   std::vector<pcl::PointCloud<pcl::Normal>::Ptr> training_normals;
   std::vector<unsigned int> training_classes;
@@ -35,6 +37,7 @@ main (int argc, char** argv)
 
     unsigned int tr_class = static_cast<unsigned int> (strtol (argv[i_cloud * 2 + 2], 0, 10));
 
+    // 一堆容器存入数据
     training_clouds.push_back (tr_cloud);
     training_normals.push_back (tr_normals);
     training_classes.push_back (tr_class);
@@ -52,6 +55,7 @@ main (int argc, char** argv)
   ism.setTrainingClasses (training_classes);
   ism.setSamplingSize (2.0f);
 
+  // 训练的模型
   pcl::ism::ImplicitShapeModelEstimation<153, pcl::PointXYZ, pcl::Normal>::ISMModelPtr model = boost::shared_ptr<pcl::features::ISMModel>
     (new pcl::features::ISMModel);
   ism.trainISM (model);
@@ -61,6 +65,8 @@ main (int argc, char** argv)
 
   model->loadModelFromfile (file);
 
+  // 测试数据
+  
   unsigned int testing_class = static_cast<unsigned int> (strtol (argv[argc - 1], 0, 10));
   pcl::PointCloud<pcl::PointXYZ>::Ptr testing_cloud (new pcl::PointCloud<pcl::PointXYZ> ());
   if ( pcl::io::loadPCDFile <pcl::PointXYZ> (argv[argc - 2], *testing_cloud) == -1 )
