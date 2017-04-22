@@ -4,11 +4,13 @@
 
 Visualizer::Visualizer () : iter_ (0), clean_ (true), r(255), g(0)
 {
-  viewer_.registerKeyboardCallback (KeyboardEventOccurred);
+  viewer_.registerKeyboardCallback (KeyboardEventOccurred);   //头文件定义viewer_
 }
 
 void
-Visualizer::Visualize ( const std::vector<pcl::PointCloud<PointType>::Ptr> model_list, const std::vector<ClusterType> found_models, const pcl::PointCloud<PointType>::Ptr scene)
+Visualizer::Visualize ( const std::vector<pcl::PointCloud<PointType>::Ptr> model_list, 
+                        const std::vector<ClusterType> found_models, 
+                        const pcl::PointCloud<PointType>::Ptr scene)
 {
 
   if (!clean_)

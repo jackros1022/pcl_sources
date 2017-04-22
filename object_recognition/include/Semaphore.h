@@ -1,3 +1,7 @@
+/*
+Semaphore,是负责协调各个线程, 以保证它们能够正确、合理的使用公共资源。也是操作系统中用于控制进程同步互斥的量。
+*/
+
 #ifndef OBJECT_RECOGNITION_SEMAPHORE
 #define OBJECT_RECOGNITION_SEMAPHORE
 
@@ -15,6 +19,7 @@ private:
     bool stop_;
 
 public:
+	// 构造函数
     Semaphore(int max_count): count_(0), max_count_(max_count), stop_(false){}
 
 	void Notify2main()

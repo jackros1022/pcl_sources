@@ -103,17 +103,18 @@ KeyboardEventOccurred (const pcl::visualization::KeyboardEvent &event)
   }
 }
 
+// 读取数据
 std::vector<pcl::PointCloud<PointType>::Ptr>
 ReadModels (char** argv, std::vector<float>& filters, std::vector<int>& icp_iterations)
 {
-  pcl::PCDReader pcdReader;
+  pcl::PCDReader pcdReader;   //读取pcd文件，若失败尝试ply文件读取
   pcl::PLYReader plyReader;
   char name[512];
   float filter;
   int icp_iteration;
   std::vector < pcl::PointCloud <PointType> ::Ptr > cloud_models;
 
-  std::ifstream pcd_file_list (argv[1]);
+  std::ifstream pcd_file_list (argv[1]);    //定义读取文件
   if(pcd_file_list.is_open()){
     while (!pcd_file_list.eof ())
     {

@@ -17,30 +17,40 @@ main (int argc, char** argv)
   pcl::PointCloud<PointType>::Ptr complete_scene (new pcl::PointCloud<PointType> ());
 
   std::vector<float> * filters = new std::vector<float>();
-  std::vector<int> * icp_iterations = new std::vector<int>();
+  std::vector<int> *   icp_iterations = new std::vector<int>();
+
   // Load the input model (n models but for now only one is used)
-  std::vector < pcl::PointCloud < PointType > ::Ptr > model_list = ReadModels (argv, *filters, *icp_iterations);
+  // 输入数据
+  std::vector < pcl::PointCloud < PointType > ::Ptr > model_list = ReadModels (argv, *filters, *icp_iterations);  //读取参数函数
   if (model_list.size () == 0) {
     std::cout << " no models loaded " << std::endl;
     return 1;
   }
 
   // Check if an oni file is specified as input or if the camera stream has to be used and initialize the correct stream.
+  // 使用openni读取Kinect数据
   OpenniStreamer * openni_streamer;
-  if(!oni_file.empty())
+  if(!oni_file.empty())   //提前预定义的数据
     openni_streamer = new OpenniStreamer(oni_file);
   else
     openni_streamer = new OpenniStreamer();
+
   // Initialize all the fundamental datastructures
   int num_threads = model_list.size();
-  Visualizer visualizer;
+  // 可视化模型
+  Visualizer visualizer; 
+  // 线程管理 
   Semaphore s(num_threads);
+
   std::vector<std::thread> thread_list(num_threads);
   std::vector<ClusterType> found_models(num_threads);
+  
+  // 写错误
   ErrorWriter e;
   int frame_index;
 
   // Read first frame and launch the threads
+  // 读取第一帧
   if(!openni_streamer->HasDataLeft())
       exit(0);
   scene = openni_streamer->GetCloud();
@@ -48,7 +58,8 @@ main (int argc, char** argv)
   frame_index = openni_streamer->GetFrameIndex();
 
   for(int i = 0; i < num_threads; ++i)
-      thread_list[i] = std::thread(FindObject, model_list[i], std::ref(scene), std::ref(s), std::ref(found_models), i, filters->at(i), icp_iterations->at(i), std::ref(e), std::ref(frame_index));
+      thread_list[i] = std::thread(FindObject, model_list[i], std::ref(scene), std::ref(s), std::ref(found_models), i, 
+      filters->at(i), icp_iterations->at(i), std::ref(e), std::ref(frame_index));
     
   // Start the main detection loop
   // 1- wait for the threads to find all the objects
@@ -58,7 +69,7 @@ main (int argc, char** argv)
     
   while(!visualizer.viewer_.wasStopped ()){
     //wait for the threads to complete
-    s.Wait4threads();
+    s.Wait4threads();   // s是什么？
     
     //Visualizing the model, scene and the estimated model position
     SetViewPoint (complete_scene);
