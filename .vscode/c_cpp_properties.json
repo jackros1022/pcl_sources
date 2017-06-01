@@ -1,0 +1,63 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include"
+                ]
+            }
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include"
+                ]
+            }
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                "C:/Program Files (x86)/PCL 1.8.0/include/pcl-1.8",
+                "C:/Program Files (x86)/PCL 1.8.0/3rdParty/Boost/include/boost-1_59",
+                "C:/Program Files (x86)/PCL 1.8.0/3rdParty/Eigen/include/eigen3",
+                "C:/Program Files (x86)/PCL 1.8.0/3rdParty/FLANN/include/flann",
+                "C:/Program Files (x86)/PCL 1.8.0/3rdParty/OpenNI/Include",
+                "C:/Program Files (x86)/PCL 1.8.0/3rdParty/Qhull/include",
+                "C:/Program Files (x86)/PCL 1.8.0/3rdParty/VTK/include/vtk-7.0",
+                "C:/Program Files/Microsoft SDKs/Kinect/v2.0_1409/inc"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                    "C:/Program Files (x86)/PCL 1.8.0/include/pcl-1.8",
+                    "C:/Program Files (x86)/PCL 1.8.0/3rdParty/Boost/include/boost-1_59",
+                    "C:/Program Files (x86)/PCL 1.8.0/3rdParty/Eigen/include/eigen3",
+                    "C:/Program Files (x86)/PCL 1.8.0/3rdParty/FLANN/include/flann",
+                    "C:/Program Files (x86)/PCL 1.8.0/3rdParty/OpenNI/Include",
+                    "C:/Program Files (x86)/PCL 1.8.0/3rdParty/Qhull/include",
+                    "C:/Program Files (x86)/PCL 1.8.0/3rdParty/VTK/include/vtk-7.0",
+                    "C:/Program Files/Microsoft SDKs/Kinect/v2.0_1409/inc"
+                ]
+            }
+        }
+    ]
+}
