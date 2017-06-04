@@ -230,7 +230,7 @@ main (int argc, char **argv)
   }
 
   // Load the object templates specified in the object_templates.txt file
-  std::vector<FeatureCloud> object_templates;
+  std::vector<FeatureCloud> object_templates;   //模板容器
   std::ifstream input_stream (argv[1]);
   object_templates.resize (0);
   std::string pcd_filename;
