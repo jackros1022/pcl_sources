@@ -1,7 +1,3 @@
-/*
-
-*/
-
 #include<pcl/io/pcd_io.h>
 #include<pcl/features/normal_3d.h>
 #include<pcl/features/pfh.h>
@@ -56,7 +52,7 @@ int main(int argc, char** argv)
 	
 	pfh.compute(*descriptors);
 	
-	/*
+
 	// Visualize the descriptors ???
 	pcl::visualization::CloudViewer viewerDescriptors(" Visualize Descriptors");
 	viewerDescriptors.showCloud(descriptors);
@@ -64,7 +60,7 @@ int main(int argc, char** argv)
 	{
 		// Do nothing
 	}
-	*/		
+	
 	
 	return 0;
 }

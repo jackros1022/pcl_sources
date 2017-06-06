@@ -257,15 +257,15 @@ main (int argc,char *argv[])
 
   /**
    *  Downsample Clouds to Extract keypoints
+   *  提取关键点
    */
 
-  /*
+  /**
   pcl::UniformSampling<PointType> uniform_sampling;
   uniform_sampling.setInputCloud (model);
   uniform_sampling.setRadiusSearch (model_ss_);
   uniform_sampling.filter (*model_keypoints);
   std::cout << "Model total points: " << model->size () << "; Selected Keypoints: " << model_keypoints->size () << std::endl;
-
   uniform_sampling.setInputCloud (scene);
   uniform_sampling.setRadiusSearch (scene_ss_);
   uniform_sampling.filter (*scene_keypoints);
@@ -327,18 +327,22 @@ main (int argc,char *argv[])
       continue;
     }
     int found_neighs = match_search.nearestKSearch (scene_descriptors->at (i), 1, neigh_indices, neigh_sqr_dists);
-    //  小于阈值视为好的匹配
+    /**
+      1.使用欧氏距离，小于阈值认为是 correspondence 。
+      2.这里的correspondence，是整个场景的，可能有些对应错误的。
+      3.然后需要corrsepondence group去cluster。常用的方法有hough3D和GC
+    */
     if (found_neighs == 1 && neigh_sqr_dists[0] < 0.25f)
     {
       pcl::Correspondence corr (neigh_indices[0], static_cast<int> (i), neigh_sqr_dists[0]);
       model_scene_corrs->push_back (corr);
-      model_good_keypoints_indices.push_back (corr.index_query);
+      model_good_keypoints_indices.push_back (corr.index_query);  // 容器处理数据
       scene_good_keypoints_indices.push_back (corr.index_match);
     }
   }
   pcl::PointCloud<PointType>::Ptr model_good_kp (new pcl::PointCloud<PointType> ());
   pcl::PointCloud<PointType>::Ptr scene_good_kp (new pcl::PointCloud<PointType> ());
-  //    通过索引，提取点云
+  //    通过索引，提取点云（初步查找的对应关系） 有什么作用？
   pcl::copyPointCloud (*model_keypoints, model_good_keypoints_indices, *model_good_kp);
   pcl::copyPointCloud (*scene_keypoints, scene_good_keypoints_indices, *scene_good_kp);
 
@@ -414,6 +418,7 @@ main (int argc,char *argv[])
 
   /**
    * Generates clouds for each instances found 
+   * create a instances list to store the “coarse” transformations
    */
   std::vector<pcl::PointCloud<PointType>::ConstPtr> instances;
 
@@ -426,11 +431,10 @@ main (int argc,char *argv[])
 
   /**
    * ICP
-   * ICP也跑来凑热闹？
    */
 
    // ICP优化配准
-   // To improve the coarse transformation associated to each object hypothesis
+   // To improve the coarse(粗糙的) transformation associated to each object hypothesis
   std::vector<pcl::PointCloud<PointType>::ConstPtr> registered_instances;
   if (true)
   {
@@ -462,7 +466,7 @@ main (int argc,char *argv[])
 
   /**
    * Hypothesis Verification
-   * 传说的 假设验证？
+   * 假设验证
    */
   cout << "--- Hypotheses Verification ---" << endl;
   std::vector<bool> hypotheses_mask;  // Mask Vector to identify positive hypotheses

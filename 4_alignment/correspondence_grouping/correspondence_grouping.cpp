@@ -123,6 +123,7 @@ parseCommandLine (int argc, char *argv[])
   pcl::console::parse_argument (argc, argv, "--cg_thresh", cg_thresh_);
 }
 
+//averaging the distance between each cloud point and its nearest neighbor
 double
 computeCloudResolution (const pcl::PointCloud<PointType>::ConstPtr &cloud)
 {
@@ -186,7 +187,7 @@ main (int argc, char *argv[])
   }
 
   //
-  //  Set up resolution invariance
+  //  Set up resolution invariance（不变性）
   //
   if (use_cloud_resolution_)
   {
