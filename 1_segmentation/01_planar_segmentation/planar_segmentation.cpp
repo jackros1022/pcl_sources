@@ -1,4 +1,6 @@
-//RANSAC算法使用SACSegmentation分割平面
+/*
+* RANSAC算法使用SACSegmentation分割平面
+*/
 #include <iostream>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/io/pcd_io.h>
@@ -26,6 +28,7 @@ int
   }
 
   // Set a few outliers
+  // 故意设置outliers
   cloud->points[0].z = 2.0;
   cloud->points[3].z = -2.0;
   cloud->points[6].z = 4.0;
@@ -42,16 +45,16 @@ int
   // Create the segmentation object
   pcl::SACSegmentation<pcl::PointXYZ> seg;
   // Optional
-  seg.setOptimizeCoefficients (true); //参数优化
+  seg.setOptimizeCoefficients (true);       //参数优化
   // Mandatory
-  seg.setModelType (pcl::SACMODEL_PLANE);
-  seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setDistanceThreshold (0.01);    //阈值
+  seg.setModelType (pcl::SACMODEL_PLANE);   //求取的模型
+  seg.setMethodType (pcl::SAC_RANSAC);      //求取的方法
+  seg.setDistanceThreshold (0.01);          //阈值
 
   seg.setInputCloud (cloud);
   seg.segment (*inliers, *coefficients);    //求取inliers，并求取模型系数
 
-  if (inliers->indices.size () == 0)    //检查inliers是否为空，否则就是无法估计模型系数
+  if (inliers->indices.size () == 0)        //检查inliers是否为空
   {
     PCL_ERROR ("Could not estimate a planar model for the given dataset.");
     return (-1);

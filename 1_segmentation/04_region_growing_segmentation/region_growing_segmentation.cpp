@@ -1,3 +1,6 @@
+/*
+RegionGrowing 区域生长分割
+*/
 #include <iostream>
 #include <vector>
 #include <pcl/point_types.h>
@@ -13,7 +16,7 @@ int
 main (int argc, char** argv)
 {
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
-  if ( pcl::io::loadPCDFile <pcl::PointXYZ> ("/home/jack/ros/pcl/pcl_sources/1_segmentation/04_region_growing_segmentation/region_growing_tutorial.pcd", *cloud) == -1)
+  if ( pcl::io::loadPCDFile <pcl::PointXYZ> ("/home/jack/learning_projects/pcl/pcl_sources/1_segmentation/04_region_growing_segmentation/region_growing_tutorial.pcd", *cloud) == -1)
   {
     std::cout << "Cloud reading failed." << std::endl;
     return (-1);
@@ -50,9 +53,9 @@ main (int argc, char** argv)
   reg.setSmoothnessThreshold (3.0 / 180.0 * M_PI);    //区域分割　平滑参数
   reg.setCurvatureThreshold (1.0);  //曲率阈值
 
-  //　区域生长分割求出的是一组聚类
+  //　区域生长分割求出的是一组聚类，也就是一组索引
   // 分割一组数据　vector
-  std::vector <pcl::PointIndices> clusters;   //向量容器
+  std::vector <pcl::PointIndices> clusters;   //容器
   reg.extract (clusters);   
 
   std::cout << "Number of clusters is equal to " << clusters.size () << std::endl;

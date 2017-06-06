@@ -30,7 +30,7 @@ enforceCurvatureOrIntensitySimilarity (const PointTypeFull& point_a, const Point
 }
 
 bool
-customRegionGrowing (const PointTypeFull& point_a, const PointTypeFull& point_b, float squared_distance)
+customRegionGrowing (const PointTypeFull& point_a, const PointTypeFull& point_b, float squared_distance)                       //条件1
 {
   Eigen::Map<const Eigen::Vector3f> point_a_normal = point_a.normal, point_b_normal = point_b.normal;
   if (squared_distance < 10000)
@@ -51,15 +51,15 @@ customRegionGrowing (const PointTypeFull& point_a, const PointTypeFull& point_b,
 int
 main (int argc, char** argv)
 {
-  // Data containers used
+  // Data containers used   【 指针要初始化，new一下死不了啊！！！】
   pcl::PointCloud<PointTypeIO>::Ptr cloud_in (new pcl::PointCloud<PointTypeIO>), cloud_out (new pcl::PointCloud<PointTypeIO>);
   pcl::PointCloud<PointTypeFull>::Ptr cloud_with_normals (new pcl::PointCloud<PointTypeFull>);
   // 聚类索引
   pcl::IndicesClustersPtr clusters (new pcl::IndicesClusters), small_clusters (new pcl::IndicesClusters), large_clusters (new pcl::IndicesClusters);
   // serchtree结构
   pcl::search::KdTree<PointTypeIO>::Ptr search_tree (new pcl::search::KdTree<PointTypeIO>);
-  // pcl控制显示台　？
-  pcl::console::TicToc tt;  //显示时间
+  //显示时间
+  pcl::console::TicToc tt;  
 
   // Load the input point cloud
   std::cerr << "Loading...\n", tt.tic ();
@@ -90,9 +90,9 @@ main (int argc, char** argv)
   // Set up a Conditional Euclidean Clustering class
   //欧式聚类条件
   std::cerr << "Segmenting to clusters...\n", tt.tic ();
-  pcl::ConditionalEuclideanClustering<PointTypeFull> cec (true);
+  pcl::ConditionalEuclideanClustering<PointTypeFull> cec (true); //定义
   cec.setInputCloud (cloud_with_normals);
-  cec.setConditionFunction (&customRegionGrowing);    
+  cec.setConditionFunction (&customRegionGrowing);    //条件
   cec.setClusterTolerance (500.0);
   cec.setMinClusterSize (cloud_with_normals->points.size () / 1000);
   cec.setMaxClusterSize (cloud_with_normals->points.size () / 5);
@@ -104,6 +104,7 @@ main (int argc, char** argv)
   for (int i = 0; i < small_clusters->size (); ++i)
     for (int j = 0; j < (*small_clusters)[i].indices.size (); ++j)
       cloud_out->points[(*small_clusters)[i].indices[j]].intensity = -2.0;
+
   for (int i = 0; i < large_clusters->size (); ++i)
     for (int j = 0; j < (*large_clusters)[i].indices.size (); ++j)
       cloud_out->points[(*large_clusters)[i].indices[j]].intensity = +10.0;

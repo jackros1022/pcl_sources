@@ -40,6 +40,7 @@ main ()
     pcl::visualization::CloudViewer viewer("Cloud Viewer");
     
     //blocks until the cloud is actually rendered
+    // 阻塞函数，直到showcloud渲染点云成功为止
     viewer.showCloud(cloud);
     
     //use the following functions to get access to the underlying more advanced/powerful
